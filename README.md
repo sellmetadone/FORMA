@@ -2,141 +2,57 @@
 
 **Windows Personal Workspace & Customization Platform**
 
-FORMA lets you create and manage a personal Windows workspace — themes, wallpapers, widgets, layouts and profiles — in one coherent environment.
+FORMA is a free, open-source desktop app for building a personal Windows workspace: themes, wallpapers, widgets, layouts, profiles and system integration — in one modular environment.
 
 > *The desktop adapts to the user, not the other way around.*
 
----
+| | |
+|---|---|
+| **Author** | sellmetadone |
+| **Telegram** | [@sofia_white_death](https://t.me/sofia_white_death) |
+| **License** | MIT |
+| **Platform** | Windows 10 / 11 |
+| **Stack** | Electron · React · TypeScript · Vite · SQLite · Zustand · Zod |
+| **Version** | 0.6.1 |
 
 ## Status
 
-**Stage I — Foundation** (in progress)
+| Stage | Focus | Readiness |
+|-------|--------|-----------|
+| I | Foundation | ~70% |
+| II | Themes, profiles, wallpapers, layouts | ~75% |
+| III | Workspace Studio | ~65% |
+| IV | Widget Engine | ~80% |
+| V | Windows integration | ~90% |
+| VI | Stabilization, CI, E2E | ~85% |
 
-- Electron + React + TypeScript + Vite
-- Application Core, Module Registry, Event Bus
-- Design System (FORMA Light / Graphite)
-- SQLite storage layer
-- Main navigation and shell
-- Settings Manager
-
-Later stages: Theme Studio, Profile Manager, Workspace Studio, Widget Engine, Windows integration, installer.
-
----
-
-## Concept
-
-FORMA is not just a wallpaper or theme manager. It is a unified platform for:
-
-- Appearance of Windows
-- Personal workspace
-- Themes and color systems
-- Wallpapers (local, scheduled, multi-monitor)
-- Widgets
-- Icons and cursors
-- Layouts
-- Profiles (WORK, GAMING, MINIMAL, …)
-
----
-
-## Stack
-
-| Component          | Technology                    |
-| ------------------ | ----------------------------- |
-| Desktop Framework  | Electron                      |
-| Frontend           | React                         |
-| Language           | TypeScript                    |
-| Build              | Vite                          |
-| State              | Zustand                       |
-| Database           | SQLite (better-sqlite3)       |
-| Validation         | Zod                           |
-| Styling            | CSS Modules + CSS Variables   |
-| Icons              | Lucide                        |
-| Testing            | Vitest + Playwright (planned) |
-| Packaging          | electron-builder              |
-
----
-
-## Architecture
-
-Modular core with clear boundaries:
-
-- **Application Core** — bootstrap, lifecycle
-- **Module Registry** — registration, dependencies, status
-- **Event Bus** — typed events between modules
-- **Theme Engine / Workspace Engine / Widget Engine / …**
-- **Storage Layer** (SQLite)
-- **Windows Integration Layer** (adapters only; no direct system calls from UI)
-
-UI never has direct access to Node.js or system APIs. All IPC is explicit and validated.
-
----
-
-## Project structure
-
-```
-FORMA/
-├── electron/
-│   ├── main/          # Electron main process
-│   ├── preload/       # Context-isolated preload
-│   ├── ipc/           # IPC handlers
-│   └── services/      # Database and system services
-├── src/
-│   ├── app/           # Root app
-│   ├── components/    # UI components
-│   ├── pages/         # Route pages
-│   ├── core/          # Registry, Event Bus
-│   ├── stores/        # Zustand stores
-│   ├── styles/        # Design tokens + global CSS
-│   └── types/
-├── resources/
-├── database/
-├── tests/
-├── docs/
-├── README.md
-├── LICENSE
-└── package.json
-```
-
----
-
-## Requirements
-
-- Node.js 20+
-- Windows 10/11 (target platform)
-- npm or pnpm
-
----
-
-## Development
+## Quick start
 
 ```bash
-# Install
+git clone https://github.com/sellmetadone/FORMA.git
+cd FORMA
 npm install
-
-# Renderer only (browser)
-npm run dev
-
-# Full Electron (when electron scripts are wired)
 npm run electron:dev
-
-# Type check
-npm run lint
-
-# Build renderer
-npm run build
 ```
 
----
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Vite dev server |
+| `npm run electron:dev` | Full desktop app |
+| `npm run build` | Production bundle |
+| `npm run electron:build` | NSIS installer |
+| `npm test` | Vitest unit tests |
+| `npm run test:e2e` | Playwright smoke |
+| `npm run ci` | typecheck + unit tests |
+
+## Security
+
+- `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`
+- Zod-validated IPC
+- Local-first data (SQLite)
+
+See [SECURITY.md](./SECURITY.md).
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
-
----
-
-## Author
-
-**sellmetadone**  
-Telegram: [@sofia_white_death](https://t.me/sofia_white_death)
-
-Repository: [github.com/sellmetadone/FORMA](https://github.com/sellmetadone/FORMA)
+MIT © sellmetadone

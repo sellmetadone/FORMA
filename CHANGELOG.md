@@ -1,20 +1,34 @@
 # Changelog
 
-All notable changes to FORMA will be documented in this file.
+## [0.6.1] — 2026-11-06
 
-## [0.1.0] — 2026-11-04
+### System (V) polish
 
-### Added (Stage I — Foundation)
+- Single-instance lock; second launch focuses window
+- Tray: Open / Hide / Launch at startup / Quit
+- Autostart with --hidden
+- Sync autostart from SQLite on boot
+- Startup error dialog; webSecurity true
 
-- Project scaffolding: Electron + React + TypeScript + Vite
-- Application Core, Module Registry, Event Bus
-- Design System (FORMA Light / Graphite) with CSS variables
-- SQLite storage layer (settings, profiles, themes, workspaces, widgets, layouts, assets)
-- Main shell: sidebar navigation, header, page routing
-- Overview, Themes (basic switch), Profiles (list), Settings pages
-- Secure preload bridge and IPC handlers
-- README, LICENSE, CONTRIBUTING, SECURITY
+### Stabilization / CI / E2E (VI)
 
-### Notes
+- Expanded Playwright smoke tests
+- CI job for Playwright + Chromium
+- Unit tests + typecheck + build
 
-- Wallpaper Manager, full Theme Studio, Workspace Studio, Widget Engine and Windows integration are planned for later stages.
+## [0.6.0] — 2026-11-06
+
+- Icon & Cursor Studio, per-monitor wallpaper
+- Playwright, GitHub Actions, signing docs
+
+## [0.5.0] — 2026-11-06
+
+- Zod IPC, migrations, diagnostics, ErrorBoundary, Vitest
+
+## [0.4.0] — Widget Engine + Windows integration
+
+## [0.3.0] — Workspace Studio, profiles, layouts
+
+## [0.2.0] — Themes & i18n
+
+## [0.1.0] — Foundation

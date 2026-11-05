@@ -1,48 +1,13 @@
-# Dependencies
 node_modules/
-.pnp
-.pnp.js
-
-# Build
 dist/
 dist-electron/
 release/
-out/
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Editor
-.vscode/*
-!.vscode/extensions.json
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# OS
 .DS_Store
-Thumbs.db
-
-# Env
+*.log
 .env
-.env.local
-.env.*.local
-
-# Test
+.env.*
 coverage/
-
-# SQLite
-*.db
-*.db-shm
-*.db-wal
-
-# Temporary
-*.tmp
-*.temp
-.cache/
+playwright-report/
+test-results/
+*.local
+.vite/

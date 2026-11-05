@@ -1,6 +1,6 @@
 {
   "name": "forma",
-  "version": "0.1.0",
+  "version": "0.6.1",
   "description": "FORMA — Windows Personal Workspace & Customization Platform",
   "author": "sellmetadone",
   "license": "MIT",
@@ -15,7 +15,11 @@
     "electron:build": "npm run build && electron-builder",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium",
+    "ci": "npm run typecheck && npm test"
   },
   "dependencies": {
     "better-sqlite3": "^11.7.0",
@@ -26,6 +30,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.1",
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.10.2",
     "@types/react": "^18.3.18",
@@ -44,8 +49,10 @@
   "build": {
     "appId": "com.sellmetadone.forma",
     "productName": "FORMA",
+    "copyright": "Copyright © sellmetadone",
     "directories": {
-      "output": "release"
+      "output": "release",
+      "buildResources": "build"
     },
     "files": [
       "dist/**/*",
@@ -53,8 +60,23 @@
     ],
     "win": {
       "target": [
-        "nsis"
-      ]
-    }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "FORMA-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "FORMA"
+    },
+    "forceCodeSigning": false,
+    "publish": null
   }
 }
