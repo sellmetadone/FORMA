@@ -1,0 +1,39 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--forma-font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--forma-text);
+  background: var(--forma-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+}
+
+a {
+  color: var(--forma-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--forma-accent);
+  outline-offset: 2px;
+}
