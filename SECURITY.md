@@ -3,25 +3,35 @@
 ## Supported versions
 
 | Version | Supported |
-| ------- | --------- |
-| 0.1.x   | Yes       |
+|---------|-----------|
+| 0.6.x   | Yes |
+| < 0.6   | Best effort |
 
-## Security principles of FORMA
+## Design constraints
+
+FORMA is a local-first desktop app. Core features do not require network access.
+
+### Electron
 
 - `contextIsolation: true`
 - `nodeIntegration: false`
-- Explicit, validated IPC channels
-- No arbitrary code execution from themes or imported assets
-- System changes require user confirmation and are reversible
-- No secrets in source code
-- Import of archives is validated (paths, size, format)
+- `sandbox: true` on BrowserWindow
+- Preload exposes a minimal typed API (`window.forma`)
+- Renderer never receives Node or Electron internals
 
-## Reporting a vulnerability
+### IPC
 
-Please report security issues privately.
+- Inputs validated with Zod schemas
+- Setting keys restricted to `[a-zA-Z0-9._-]+`
 
-Contact the author via Telegram: **@sofia_white_death**
+### System changes
 
-or open a private security advisory on GitHub if available.
+- Wallpaper: path validation, image extensions only
+- Autostart: Electron `setLoginItemSettings` only
+- App launcher: basename allowlist or absolute paths
+- External URLs: http(s) only
+- Cursor apply: backup before change, restore available
 
-Do not disclose vulnerabilities publicly until a fix has been released.
+## Reporting
+
+Telegram: **@sofia_white_death** · GitHub: **sellmetadone**
