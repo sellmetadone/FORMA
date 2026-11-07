@@ -1,0 +1,43 @@
+.header {
+  height: var(--forma-header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--forma-border);
+  background: var(--forma-bg);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--forma-text);
+  letter-spacing: -0.02em;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profileBadge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 5px 12px;
+  border-radius: var(--forma-radius-sm);
+  background: var(--forma-accent-muted);
+  color: var(--forma-accent);
+  text-transform: uppercase;
+}
+
+.themeBadge {
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: var(--forma-radius-sm);
+  border: 1px solid var(--forma-border);
+  color: var(--forma-text-secondary);
+  background: var(--forma-surface);
+}
