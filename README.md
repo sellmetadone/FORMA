@@ -7,55 +7,66 @@
 | **Author** | sellmetadone |
 | **Telegram** | [@sofia_white_death](https://t.me/sofia_white_death) |
 | **License** | MIT |
-| **Version** | 0.6.1 |
+| **Version** | 0.9.0 |
+
+> *The desktop adapts to the user, not the other way around.*
 
 ## Quick start (Windows)
 
-### Option A — double-click
+1. Unpack the project so `package.json` is in the folder root.
+2. Double-click **`install-and-run.bat`**
+   - checks Node/npm
+   - fixes broken npm prefix/cache (e.g. `F:\`)
+   - runs `npm install`
+   - starts Electron + Vite
 
-1. Download ZIP from GitHub (**Code → Download ZIP**) or clone the repo.
-2. Unpack so that `package.json` is in the folder.
-3. Double-click **`install-and-run.bat`**
-
-The bat will:
-- check Node.js / npm
-- fix broken npm `prefix`/`cache` (e.g. pointing at `F:\`)
-- run `npm install`
-- start `npm run electron:dev`
-
-After the first install, you can use **`run.bat`** to start only.
-
-### Option B — terminal
+After install, use **`run.bat`** for subsequent launches.
 
 ```bat
-cd path\to\FORMA
 npm install
 npm run electron:dev
 ```
 
-If `npm install` fails with `EPERM mkdir 'F:\'`:
+**Ctrl+K** — Command Palette.
 
-```bat
-npm config delete prefix
-npm config set cache "%LOCALAPPDATA%\npm-cache"
-npm config set prefix "%APPDATA%\npm"
-npm install
-```
+**Ctrl+Shift+F** — Global Search.
+
+## Status (honest)
+
+| Area | State |
+|------|--------|
+| Foundation (Electron, SQLite, IPC, shell) | Working |
+| Themes (11 built-in + custom export) | Working |
+| Workspace Studio (drag, resize, undo, multi-ws) | Working (expanding) |
+| Widgets | Working |
+| Profiles | Working |
+| Wallpapers + multi-monitor | Working on Windows |
+| Live desktop video/web (WorkerW) | Working on Windows (fallback if attach fails) |
+| Icons / cursors | Working |
+| Command Palette / Global Search | Working |
+| Backup Manager | Working (JSON package) |
+| Overall readiness | **~86%** |
+
+## Live desktop (Windows)
+
+Video / web / gif wallpapers use an Electron host window parented to the desktop **WorkerW** layer when possible.
+
+1. Open **Wallpapers** → Live engine
+2. Add a file path or URL
+3. **Apply to desktop**
+4. **Stop live desktop** to remove
+
+Static images still use the system DesktopWallpaper COM API.
 
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
-| `install-and-run.bat` | Install + run (Windows) |
-| `run.bat` | Run after install |
-| `npm run electron:dev` | Electron + Vite |
-| `npm run dev` | Renderer only |
-| `npm test` | Unit tests |
-| `npm run test:e2e` | Playwright |
-
-## Status
-
-Source is being published incrementally. Core shell, CI, tests, preload, bats are on `main`. Some large modules may still land in follow-up commits.
+| `install-and-run.bat` | Install + run |
+| `run.bat` | Run only |
+| `npm run electron:dev` | Dev app |
+| `npm test` | Vitest |
+| `npm run typecheck` | TypeScript |
 
 ## License
 
