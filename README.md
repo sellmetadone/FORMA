@@ -7,7 +7,7 @@
 | **Author** | sellmetadone |
 | **Telegram** | [@sofia_white_death](https://t.me/sofia_white_death) |
 | **License** | MIT |
-| **Version** | 0.9.0 |
+| **Version** | 1.0.0-rc.1 |
 
 > *The desktop adapts to the user, not the other way around.*
 
@@ -15,58 +15,26 @@
 
 1. Unpack the project so `package.json` is in the folder root.
 2. Double-click **`install-and-run.bat`**
-   - checks Node/npm
-   - fixes broken npm prefix/cache (e.g. `F:\`)
-   - runs `npm install`
-   - starts Electron + Vite
-
-After install, use **`run.bat`** for subsequent launches.
+3. After install, use **`run.bat`**
 
 ```bat
 npm install
 npm run electron:dev
 ```
 
-**Ctrl+K** — Command Palette.
+**Ctrl+K** — Command Palette · **Ctrl+Shift+F** — Global Search
 
-**Ctrl+Shift+F** — Global Search.
+## Status
 
-## Status (honest)
+**1.0.0-rc.1** (~90%). Final **1.0.0** after P0 + QA on Win10/11.
 
-| Area | State |
-|------|--------|
-| Foundation (Electron, SQLite, IPC, shell) | Working |
-| Themes (11 built-in + custom export) | Working |
-| Workspace Studio (drag, resize, undo, multi-ws) | Working (expanding) |
-| Widgets | Working |
-| Profiles | Working |
-| Wallpapers + multi-monitor | Working on Windows |
-| Live desktop video/web (WorkerW) | Working on Windows (fallback if attach fails) |
-| Icons / cursors | Working |
-| Command Palette / Global Search | Working |
-| Backup Manager | Working (JSON package) |
-| Overall readiness | **~86%** |
+See [ROADMAP-1.0.md](./ROADMAP-1.0.md) and [docs/QA-1.0.md](./docs/QA-1.0.md).
 
 ## Live desktop (Windows)
 
-Video / web / gif wallpapers use an Electron host window parented to the desktop **WorkerW** layer when possible.
+Video/web/gif → WorkerW host when possible. Static images → COM API.
 
-1. Open **Wallpapers** → Live engine
-2. Add a file path or URL
-3. **Apply to desktop**
-4. **Stop live desktop** to remove
-
-Static images still use the system DesktopWallpaper COM API.
-
-## Scripts
-
-| Command | Description |
-|---------|-------------|
-| `install-and-run.bat` | Install + run |
-| `run.bat` | Run only |
-| `npm run electron:dev` | Dev app |
-| `npm test` | Vitest |
-| `npm run typecheck` | TypeScript |
+**Known limit:** if WorkerW attach fails, a fallback full-screen window is used; use **Stop live desktop** or tray **Stop live wallpaper**.
 
 ## License
 
