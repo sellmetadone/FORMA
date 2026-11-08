@@ -1,25 +1,20 @@
 @echo off
-chcp 65001 >nul
 setlocal EnableExtensions
-title FORMA — Install & Run
 cd /d "%~dp0"
 
-echo.
-echo  ========================================
-echo   FORMA — install dependencies and run
-echo  ========================================
-echo.
+echo === FORMA install-and-run ===
+echo Working directory: %CD%
 
 where node >nul 2>&1
 if errorlevel 1 (
-  echo [ERROR] Node.js not found. Install from https://nodejs.org/ and reopen this window.
+  echo ERROR: Node.js not found. Install from https://nodejs.org/
   pause
   exit /b 1
 )
 
 where npm >nul 2>&1
 if errorlevel 1 (
-  echo [ERROR] npm not found. Reinstall Node.js with npm included.
+  echo ERROR: npm not found.
   pause
   exit /b 1
 )
@@ -28,60 +23,35 @@ echo Node:
 node -v
 echo npm:
 npm -v
-echo.
 
-REM Fix broken npm prefix/cache pointing at drive roots (e.g. F:\)
-for /f "delims=" %%A in ('npm config get prefix 2^>nul') do set "NPM_PREFIX=%%A"
-echo Current npm prefix: %NPM_PREFIX%
-echo %NPM_PREFIX%| findstr /I /R "^[A-Za-z]:\\$" >nul
+for /f "delims=" %%A in ('npm config get prefix 2^>nul') do set NPM_PREFIX=%%A
+for /f "delims=" %%A in ('npm config get cache 2^>nul') do set NPM_CACHE=%%A
+echo npm prefix=%NPM_PREFIX%
+echo npm cache=%NPM_CACHE%
+
+echo %NPM_PREFIX% | findstr /I /C:"F:\\" >nul
 if not errorlevel 1 (
-  echo [FIX] npm prefix looks like a drive root. Resetting to user folders...
-  npm config delete prefix 2>nul
-  npm config set prefix "%APPDATA%\npm"
+  echo Resetting invalid npm prefix...
+  npm config delete prefix
 )
-for /f "delims=" %%A in ('npm config get cache 2^>nul') do set "NPM_CACHE=%%A"
-echo Current npm cache: %NPM_CACHE%
-echo %NPM_CACHE%| findstr /I /R "^[A-Za-z]:\\$" >nul
+echo %NPM_CACHE% | findstr /I /C:"F:\\" >nul
 if not errorlevel 1 (
-  echo [FIX] npm cache looks like a drive root. Resetting...
-  npm config delete cache 2>nul
-  npm config set cache "%LOCALAPPDATA%\npm-cache"
+  echo Resetting invalid npm cache...
+  npm config delete cache
 )
 
-if not exist "package.json" (
-  echo [ERROR] package.json not found. Put this .bat into the FORMA project root.
-  pause
-  exit /b 1
-)
+npm config set cache "%CD%\.npm-cache" --location=project 2>nul
 
 echo.
-echo [1/3] npm install ...
-echo.
+echo Running npm install...
 call npm install
 if errorlevel 1 (
-  echo.
-  echo [ERROR] npm install failed.
-  echo Try:
-  echo   npm cache clean --force
-  echo   npm config delete prefix
-  echo   npm config set cache "%%LOCALAPPDATA%%\npm-cache"
-  echo   npm install
+  echo npm install failed.
   pause
   exit /b 1
 )
 
 echo.
-echo [2/3] Starting FORMA (Electron + Vite)...
-echo      Close the window or press Ctrl+C in this console to stop.
-echo.
-
+echo Starting FORMA...
 call npm run electron:dev
-if errorlevel 1 (
-  echo.
-  echo electron:dev failed — trying renderer only: npm run dev
-  call npm run dev
-)
-
-echo.
 pause
-endlocal
