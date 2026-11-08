@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { DatabaseService } from '../services/database';
 import { registerIpcHandlers } from '../ipc/handlers';
 import { getAutostartEnabled, setAutostart } from '../windows/system';
+import { stopLiveWallpaper } from '../windows/liveDesktop';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -124,10 +125,17 @@ function rebuildTrayMenu() {
     },
     { type: 'separator' },
     {
+      label: 'Stop live wallpaper',
+      click: () => {
+        void stopLiveWallpaper().catch((err) => console.warn('[FORMA] stop live', err));
+      },
+    },
+    { type: 'separator' },
+    {
       label: 'Quit FORMA',
       click: () => {
         isQuitting = true;
-        app.quit();
+        void stopLiveWallpaper().finally(() => app.quit());
       },
     },
   ]);
@@ -191,6 +199,14 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
   isQuitting = true;
+});
+
+app.on('will-quit', () => {
+  try {
+    void stopLiveWallpaper();
+  } catch {
+    /* ignore */
+  }
   try {
     db?.close();
   } catch {
