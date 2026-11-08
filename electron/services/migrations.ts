@@ -2,6 +2,10 @@ import type Database from 'better-sqlite3';
 
 const CURRENT_SCHEMA_VERSION = 2;
 
+/**
+ * Lightweight schema migrations.
+ * schema_version is stored in settings table as key "db.schema_version".
+ */
 export function runMigrations(db: Database.Database) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS settings (
