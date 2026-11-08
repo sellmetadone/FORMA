@@ -7,34 +7,38 @@
 | **Author** | sellmetadone |
 | **Telegram** | [@sofia_white_death](https://t.me/sofia_white_death) |
 | **License** | MIT |
-| **Version** | 1.0.0-rc.1 |
+| **Version** | **1.0.0** |
 
 > *The desktop adapts to the user, not the other way around.*
 
 ## Quick start (Windows)
 
-1. Unpack the project so `package.json` is in the folder root.
-2. Double-click **`install-and-run.bat`**
-3. After install, use **`run.bat`**
-
 ```bat
-npm install
-npm run electron:dev
+git clone https://github.com/sellmetadone/FORMA.git
+cd FORMA
+install-and-run.bat
 ```
+
+Or unpack **FORMA-1.0.0-source.zip**, then `install-and-run.bat`.
 
 **Ctrl+K** — Command Palette · **Ctrl+Shift+F** — Global Search
 
-## Status
+## Release 1.0.0
 
-**1.0.0-rc.1** (~90%). Final **1.0.0** after P0 + QA on Win10/11.
+- [RELEASE_NOTES.md](./RELEASE_NOTES.md)
+- [ROADMAP-1.0.md](./ROADMAP-1.0.md)
+- [docs/QA-1.0.md](./docs/QA-1.0.md)
+- Tag helpers: `scripts/tag-v1.0.0.bat` / `.sh`
+- Branch marker: `release/v1.0.0`
 
-See [ROADMAP-1.0.md](./ROADMAP-1.0.md) and [docs/QA-1.0.md](./docs/QA-1.0.md).
+```bash
+git tag -a v1.0.0 -m "FORMA 1.0.0"
+git push origin v1.0.0
+```
 
-## Live desktop (Windows)
+## Live desktop
 
-Video/web/gif → WorkerW host when possible. Static images → COM API.
-
-**Known limit:** if WorkerW attach fails, a fallback full-screen window is used; use **Stop live desktop** or tray **Stop live wallpaper**.
+Video/web → WorkerW when possible; static images → COM. See known limits in RELEASE_NOTES.
 
 ## License
 
