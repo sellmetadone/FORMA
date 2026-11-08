@@ -40,6 +40,16 @@ export type FormaAPI = {
   applyCursorArrow: (filePath: string) => Promise<{ ok: boolean; error?: string }>;
   restoreCursors: () => Promise<{ ok: boolean; error?: string }>;
   getDiagnostics: () => Promise<unknown>;
+  startLiveWallpaper: (data: {
+    kind: 'video' | 'web' | 'gif' | 'image';
+    source: string;
+    muted?: boolean;
+    monitorIndex?: number | null;
+  }) => Promise<{ ok: boolean; error?: string; attachedWorkerW?: boolean }>;
+  stopLiveWallpaper: () => Promise<{ ok: boolean }>;
+  pauseLiveWallpaper: () => Promise<{ ok: boolean }>;
+  resumeLiveWallpaper: () => Promise<{ ok: boolean }>;
+  getLiveWallpaperStatus: () => Promise<unknown>;
   onEvent: (channel: string, callback: (...args: unknown[]) => void) => () => void;
 };
 
@@ -78,6 +88,11 @@ const api: FormaAPI = {
   applyCursorArrow: (filePath) => ipcRenderer.invoke('cursors:applyArrow', filePath),
   restoreCursors: () => ipcRenderer.invoke('cursors:restore'),
   getDiagnostics: () => ipcRenderer.invoke('diagnostics:get'),
+  startLiveWallpaper: (data) => ipcRenderer.invoke('liveWallpaper:start', data),
+  stopLiveWallpaper: () => ipcRenderer.invoke('liveWallpaper:stop'),
+  pauseLiveWallpaper: () => ipcRenderer.invoke('liveWallpaper:pause'),
+  resumeLiveWallpaper: () => ipcRenderer.invoke('liveWallpaper:resume'),
+  getLiveWallpaperStatus: () => ipcRenderer.invoke('liveWallpaper:status'),
   onEvent: (channel, callback) => {
     const listener = (_event: Electron.IpcRendererEvent, ...args: unknown[]) => callback(...args);
     ipcRenderer.on(channel, listener);
