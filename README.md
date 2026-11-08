@@ -19,26 +19,29 @@ cd FORMA
 install-and-run.bat
 ```
 
-Or unpack **FORMA-1.0.0-source.zip**, then `install-and-run.bat`.
+If `npm` errors with `EPERM mkdir F:\`:
+
+```bat
+npm config delete prefix
+npm config delete cache
+npm install
+npm run electron:dev
+```
 
 **Ctrl+K** — Command Palette · **Ctrl+Shift+F** — Global Search
 
-## Release 1.0.0
+## Docs
 
 - [RELEASE_NOTES.md](./RELEASE_NOTES.md)
-- [ROADMAP-1.0.md](./ROADMAP-1.0.md)
+- [docs/INTEGRITY-REPAIR.md](./docs/INTEGRITY-REPAIR.md)
 - [docs/QA-1.0.md](./docs/QA-1.0.md)
-- Tag helpers: `scripts/tag-v1.0.0.bat` / `.sh`
-- Branch marker: `release/v1.0.0`
+- [docs/GITHUB-SYNC.md](./docs/GITHUB-SYNC.md)
 
-```bash
-git tag -a v1.0.0 -m "FORMA 1.0.0"
-git push origin v1.0.0
+## Tag v1.0.0
+
+```bat
+scripts\tag-v1.0.0.bat
 ```
-
-## Live desktop
-
-Video/web → WorkerW when possible; static images → COM. See known limits in RELEASE_NOTES.
 
 ## License
 
