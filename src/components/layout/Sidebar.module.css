@@ -1,0 +1,118 @@
+.sidebar {
+  width: var(--forma-sidebar-width);
+  background: var(--forma-surface);
+  border-right: 1px solid var(--forma-border);
+  display: flex;
+  flex-direction: column;
+  transition: width var(--forma-transition), background-color var(--forma-transition-slow), border-color var(--forma-transition-slow);
+  flex-shrink: 0;
+}
+
+.collapsed {
+  width: var(--forma-sidebar-collapsed);
+}
+
+.brand {
+  height: var(--forma-header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 0 18px;
+  border-bottom: 1px solid var(--forma-border-subtle);
+}
+
+.logo {
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  color: var(--forma-text);
+}
+
+.collapseBtn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--forma-radius-sm);
+  color: var(--forma-text-secondary);
+  transition: background var(--forma-transition), color var(--forma-transition);
+}
+
+.collapseBtn:hover {
+  background: var(--forma-surface-hover);
+  color: var(--forma-text);
+}
+
+.nav {
+  flex: 1;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--forma-radius-md);
+  color: var(--forma-text-secondary);
+  transition: background var(--forma-transition), color var(--forma-transition);
+  text-align: start;
+  width: 100%;
+  font-size: 13.5px;
+}
+
+.navItem:hover {
+  background: var(--forma-surface-hover);
+  color: var(--forma-text);
+}
+
+.navItem.active {
+  background: var(--forma-accent-muted);
+  color: var(--forma-accent);
+  font-weight: 550;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footer {
+  padding: 12px 18px;
+  border-top: 1px solid var(--forma-border-subtle);
+}
+
+.version {
+  font-size: 11px;
+  color: var(--forma-text-muted);
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.collapsed .brand {
+  justify-content: center;
+  padding: 0;
+}
+
+.collapsed .navItem {
+  justify-content: center;
+  padding: 11px;
+}
+
+.collapsed .footer {
+  display: none;
+}
