@@ -114,7 +114,8 @@ export type WidgetTypeId =
   | 'weather'
   | 'quick-links'
   | 'timer'
-  | 'app-launcher';
+  | 'app-launcher'
+  | 'media';
 
 export interface WidgetDefinition {
   id: WidgetTypeId;
