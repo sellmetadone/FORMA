@@ -1,0 +1,245 @@
+.chrome {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--forma-bg);
+  border: 1px solid var(--forma-border);
+  border-radius: var(--forma-radius-md, 10px);
+  overflow: hidden;
+  box-shadow: var(--forma-shadow-sm);
+}
+
+.chromeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--forma-surface);
+  border-bottom: 1px solid var(--forma-border-subtle, var(--forma-border));
+}
+
+.chromeTitle {
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--forma-text);
+}
+
+.chromeBody {
+  flex: 1;
+  padding: 10px 12px;
+  overflow: auto;
+  min-height: 0;
+}
+
+.clockTime {
+  font-size: 28px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  color: var(--forma-text);
+  text-align: center;
+}
+
+.clockDate {
+  font-size: 12px;
+  color: var(--forma-text-secondary);
+  text-align: center;
+  margin-top: 4px;
+}
+
+.calNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.calNav button {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--forma-text-secondary);
+}
+
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+  font-size: 11px;
+}
+
+.calDow {
+  color: var(--forma-text-muted);
+  font-weight: 550;
+  padding: 4px 0;
+}
+
+.calDay {
+  padding: 6px 0;
+  border-radius: 6px;
+  color: var(--forma-text);
+}
+
+.calToday {
+  background: var(--forma-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.notesArea {
+  width: 100%;
+  height: 100%;
+  min-height: 100px;
+  border: none;
+  resize: none;
+  background: transparent;
+  color: var(--forma-text);
+  font: inherit;
+}
+
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.linkBtn,
+.appBtn,
+.timerBtn {
+  border: 1px solid var(--forma-border);
+  background: var(--forma-surface);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: var(--forma-text);
+  font-size: 13px;
+}
+
+.apps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meter {
+  margin-bottom: 10px;
+}
+
+.meterLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 4px;
+  color: var(--forma-text-secondary);
+}
+
+.meterBar {
+  height: 6px;
+  background: var(--forma-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.meterFill {
+  height: 100%;
+  background: var(--forma-accent);
+  border-radius: 999px;
+}
+
+.platform {
+  font-size: 11px;
+  color: var(--forma-text-muted);
+  margin-top: 6px;
+}
+
+.timerDisplay {
+  font-size: 32px;
+  font-weight: 650;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.timerActions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.weatherCity {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.weatherCityBtn {
+  border: none;
+  background: transparent;
+  color: var(--forma-text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.weatherInput {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--forma-border);
+  border-radius: 6px;
+}
+
+.weatherTemp {
+  font-size: 28px;
+  font-weight: 650;
+  text-align: center;
+}
+
+.weatherDesc {
+  text-align: center;
+  font-size: 12px;
+  color: var(--forma-text-muted);
+}
+
+.mediaBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mediaTrack {
+  font-weight: 550;
+  font-size: 14px;
+}
+
+.mediaArtist {
+  font-size: 12px;
+  color: var(--forma-text-secondary);
+}
+
+.mediaControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.iconBtn {
+  border: 1px solid var(--forma-border);
+  background: var(--forma-surface);
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.mediaHint {
+  font-size: 11px;
+  color: var(--forma-text-muted);
+  margin: 8px 0 0;
+}
