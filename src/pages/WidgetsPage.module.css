@@ -1,0 +1,36 @@
+.catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.instances {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.instanceCard {
+  border: 1px solid var(--forma-border, #e5e5e5);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--forma-surface, #f7f7f7);
+}
+
+.instanceHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: 550;
+}
+
+.instanceActions {
+  display: flex;
+  gap: 8px;
+}
+
+.preview {
+  max-width: 320px;
+}
