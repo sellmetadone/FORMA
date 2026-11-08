@@ -1,33 +1,26 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { logger } from '@/core/logger';
 
-interface Props {
-  children: ReactNode;
-}
-
-interface State {
-  hasError: boolean;
-  message: string;
-}
+type Props = { children: ReactNode };
+type State = { error: Error | null };
 
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false, message: '' };
+  state: State = { error: null };
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, message: error.message || 'Unknown error' };
+    return { error };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    logger.error('ErrorBoundary', error.message, info.componentStack);
+    console.error('[FORMA] UI error:', error, info.componentStack);
   }
 
   render() {
-    if (this.state.hasError) {
+    if (this.state.error) {
       return (
-        <div style={{ padding: 32, maxWidth: 480, margin: '80px auto', fontFamily: 'system-ui, sans-serif' }}>
-          <h1 style={{ fontSize: 20, marginBottom: 12 }}>FORMA encountered an error</h1>
-          <p style={{ fontSize: 14, color: '#555', marginBottom: 16 }}>{this.state.message}</p>
-          <button type="button" onClick={() => this.setState({ hasError: false, message: '' })}>
+        <div style={{ padding: 24, fontFamily: 'system-ui' }}>
+          <h1>Something went wrong</h1>
+          <pre style={{ whiteSpace: 'pre-wrap' }}>{this.state.error.message}</pre>
+          <button type="button" onClick={() => this.setState({ error: null })}>
             Try again
           </button>
         </div>
