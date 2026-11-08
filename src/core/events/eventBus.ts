@@ -3,7 +3,7 @@ import type { FormaEvent } from '@/types';
 type Listener = (payload?: unknown) => void;
 
 class EventBus {
-  private listeners = new Map<string, Set<Listener>>();
+  private listeners = new Map<FormaEvent | string, Set<Listener>>();
 
   on(event: FormaEvent | string, listener: Listener): () => void {
     if (!this.listeners.has(event)) {
@@ -18,15 +18,17 @@ class EventBus {
   }
 
   emit(event: FormaEvent | string, payload?: unknown) {
-    const set = this.listeners.get(event);
-    if (!set) return;
-    for (const listener of set) {
+    this.listeners.get(event)?.forEach((listener) => {
       try {
         listener(payload);
       } catch (err) {
         console.error(`[EventBus] Error in listener for ${event}:`, err);
       }
-    }
+    });
+  }
+
+  clear() {
+    this.listeners.clear();
   }
 }
 

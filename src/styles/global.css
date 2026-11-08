@@ -2,38 +2,29 @@
 *::before,
 *::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html,
 body,
 #root {
   height: 100%;
+  margin: 0;
 }
 
 body {
-  font-family: var(--forma-font-sans);
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--forma-text);
-  background: var(--forma-bg);
+  font-family: var(--font-sans, system-ui, -apple-system, Segoe UI, Roboto, sans-serif);
+  background: var(--color-bg, #fff);
+  color: var(--color-text, #1a1a1a);
   -webkit-font-smoothing: antialiased;
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-  background: none;
-  border: none;
-  color: inherit;
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 a {
-  color: var(--forma-accent);
-}
-
-:focus-visible {
-  outline: 2px solid var(--forma-accent);
-  outline-offset: 2px;
+  color: var(--color-accent, #2d5a4a);
 }
