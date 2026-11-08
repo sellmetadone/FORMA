@@ -65,6 +65,14 @@ export const WIDGET_DEFINITIONS: Record<WidgetTypeId, WidgetDefinition> = {
     defaultHeight: 180,
     refreshMs: 0,
   },
+  media: {
+    id: 'media',
+    nameKey: 'widgets.media',
+    descriptionKey: 'widgets.mediaDesc',
+    defaultWidth: 260,
+    defaultHeight: 120,
+    refreshMs: 1000,
+  },
 };
 
 export const WIDGET_TYPE_IDS = Object.keys(WIDGET_DEFINITIONS) as WidgetTypeId[];
