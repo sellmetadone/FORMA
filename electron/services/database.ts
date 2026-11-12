@@ -15,6 +15,11 @@ export class DatabaseService {
       this.db.pragma('foreign_keys = ON');
     } catch (err) {
       console.error('[FORMA] Failed to open database:', err);
+      const hint =
+        ' If NODE_MODULE_VERSION mismatch: run npm run rebuild:native (Electron ABI).';
+      if (err instanceof Error) {
+        err.message = err.message + hint;
+      }
       throw err;
     }
   }
