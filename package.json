@@ -12,15 +12,17 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "electron:dev": "vite",
-    "electron:dev:manual": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:build": "npm run build && electron-builder",
+    "postinstall": "electron-builder install-app-deps",
+    "rebuild:native": "electron-builder install-app-deps",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
-    "ci": "npm run typecheck && npm test"
+    "ci": "npm run typecheck && npm test",
+    "electron:dev:manual": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron .\""
   },
   "dependencies": {
     "better-sqlite3": "^11.7.0",

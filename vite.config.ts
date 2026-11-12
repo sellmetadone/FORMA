@@ -8,7 +8,8 @@ const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * FORMA Vite config
- * - Scoped file watch (avoid F:\\DumpStack.log.tmp / system paths)
+ * - Scoped file watch (avoid DumpStack.log.tmp / system paths)
+ * - Never ignore whole drive (project may live on F:\\FORMA)
  * - Electron main/preload via vite-plugin-electron/simple
  * - better-sqlite3 external (native)
  */
@@ -74,13 +75,13 @@ export default defineConfig({
         '**/dist-electron/**',
         '**/release/**',
         '**/.git/**',
+        '**/.npm-cache/**',
         '**/DumpStack.log.tmp',
         '**/pagefile.sys',
         '**/hiberfil.sys',
         '**/swapfile.sys',
         '**/System Volume Information/**',
         '**/$Recycle.Bin/**',
-        'F:/**',
       ],
     },
   },
