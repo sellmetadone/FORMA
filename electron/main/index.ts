@@ -1,5 +1,6 @@
 import { app, BrowserWindow, Tray, Menu, nativeImage, dialog } from 'electron';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { DatabaseService } from '../services/database';
 import { registerIpcHandlers } from '../ipc/handlers';
@@ -21,7 +22,6 @@ let isQuitting = false;
 
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 
-// Single instance — second launch focuses the existing window
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
@@ -48,7 +48,17 @@ function createWindow() {
     show: false,
     autoHideMenuBar: true,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.js'),
+      preload: (() => {
+        const candidates = [
+          path.join(__dirname, '../preload/index.js'),
+          path.join(__dirname, '../preload/index.mjs'),
+          path.join(__dirname, '../preload/index.cjs'),
+        ];
+        for (const c of candidates) {
+          if (fs.existsSync(c)) return c;
+        }
+        return candidates[0];
+      })(),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
@@ -101,14 +111,8 @@ function rebuildTrayMenu() {
     /* ignore */
   }
   const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Open FORMA',
-      click: () => showMainWindow(),
-    },
-    {
-      label: 'Hide to tray',
-      click: () => mainWindow?.hide(),
-    },
+    { label: 'Open FORMA', click: () => showMainWindow() },
+    { label: 'Hide to tray', click: () => mainWindow?.hide() },
     { type: 'separator' },
     {
       label: autostartOn ? '✓ Launch at startup' : 'Launch at startup',
@@ -164,7 +168,6 @@ app.whenReady().then(async () => {
     const userDataPath = app.getPath('userData');
     db = new DatabaseService(path.join(userDataPath, 'forma.db'));
     await db.initialize();
-    registerIpcHandlers(db);
 
     const saved = db.getSetting('system.autostart');
     if (saved === 'true' || saved === 'false') {
@@ -175,8 +178,22 @@ app.whenReady().then(async () => {
       }
     }
   } catch (err) {
-    console.error('[FORMA] Startup failed:', err);
-    dialog.showErrorBox('FORMA', `Failed to start:\n${err instanceof Error ? err.message : String(err)}`);
+    console.error('[FORMA] Database startup failed:', err);
+    db = null;
+    dialog.showErrorBox(
+      'FORMA — SQLite',
+      'Native module better-sqlite3 failed to load.\n\n' +
+        'Fix (in project folder):\n' +
+        '  npm run rebuild:native\n\n' +
+        'Requires Visual C++ Build Tools if rebuild compiles from source.\n\n' +
+        String(err instanceof Error ? err.message : err)
+    );
+  }
+
+  try {
+    registerIpcHandlers(db);
+  } catch (err) {
+    console.error('[FORMA] IPC registration failed:', err);
   }
 
   createWindow();
@@ -193,7 +210,7 @@ app.whenReady().then(async () => {
 
 app.on('window-all-closed', () => {
   if (process.platform === 'darwin') {
-    // macOS standard
+    // macOS
   }
 });
 
