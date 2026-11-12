@@ -1,0 +1,108 @@
+.canvas {
+  position: relative;
+  flex: 1;
+  min-height: 420px;
+  border: 1px solid var(--forma-border);
+  border-radius: var(--forma-radius-md, 10px);
+  background: var(--forma-surface);
+  overflow: hidden;
+  user-select: none;
+}
+
+.element {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: var(--forma-bg);
+  border: 1px solid var(--forma-border);
+  border-radius: 8px;
+  box-shadow: var(--forma-shadow-sm);
+  overflow: hidden;
+  cursor: grab;
+}
+
+.element.selected {
+  border-color: var(--forma-accent);
+  box-shadow: 0 0 0 1px var(--forma-accent);
+}
+
+.elementHeader {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: var(--forma-surface);
+  border-bottom: 1px solid var(--forma-border-subtle, var(--forma-border));
+  font-size: 11px;
+}
+
+.elementTitle {
+  font-weight: 550;
+  color: var(--forma-text);
+}
+
+.elementType {
+  color: var(--forma-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.elementBody {
+  flex: 1;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.clockFace {
+  font-size: 22px;
+  font-weight: 650;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.notePreview,
+.placeholder {
+  font-size: 12px;
+  color: var(--forma-text-secondary);
+}
+
+.resizeHandle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+  cursor: nwse-resize;
+  background: var(--forma-accent);
+  border-radius: 2px 0 0 0;
+}
+
+.guideV {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--forma-accent);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.guideH {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--forma-accent);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--forma-text-muted);
+  font-size: 13px;
+  pointer-events: none;
+}
