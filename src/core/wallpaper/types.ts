@@ -1,4 +1,4 @@
-/** FORMA Wallpaper Engine types — concepts inspired by live-wallpaper apps; original MIT code. */
+/** FORMA Wallpaper Engine types — original MIT code. */
 
 export type WallpaperKind = 'image' | 'video' | 'gif' | 'web';
 

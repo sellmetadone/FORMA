@@ -3,7 +3,10 @@ import { DEFAULT_PERFORMANCE } from './types';
 
 type Listener = (state: SmartPauseState) => void;
 
-/** SmartPause — pause animated wallpapers when blurred/hidden or on battery (FORMA MIT). */
+/**
+ * SmartPause — pause animated wallpapers when app is blurred/hidden or on battery.
+ * FORMA-owned implementation (MIT).
+ */
 export class SmartPauseController {
   private policy: PerformancePolicy = { ...DEFAULT_PERFORMANCE };
   private state: SmartPauseState = { paused: false, reason: 'none' };
