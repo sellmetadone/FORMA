@@ -55,49 +55,58 @@ function handle(channel: string, fn: (...args: unknown[]) => unknown) {
   });
 }
 
-export function registerIpcHandlers(db: DatabaseService) {
+export function registerIpcHandlers(db: DatabaseService | null) {
   handle('app:getVersion', () => app.getVersion());
 
-  handle('settings:getAll', () => db.getAllSettings());
+  const requireDb = (): DatabaseService => {
+    if (!db) {
+      throw new Error(
+        'SQLite unavailable. From project root run: npm run rebuild:native'
+      );
+    }
+    return db;
+  };
+
+  handle('settings:getAll', () => (db ? db.getAllSettings() : {}));
   handle('settings:set', (key, value) => {
     const k = parseOrThrow(SettingKeySchema, key, 'settings.key');
     parseOrThrow(SettingValueSchema, value, 'settings.value');
-    db.setSetting(k, typeof value === 'string' ? value : JSON.stringify(value));
+    requireDb().setSetting(k, typeof value === 'string' ? value : JSON.stringify(value));
   });
 
-  handle('profiles:list', () => db.listProfiles());
+  handle('profiles:list', () => (db ? db.listProfiles() : []));
   handle('profiles:create', (data) => {
     const parsed = parseOrThrow(ProfileCreateSchema, data, 'profiles.create');
-    return db.createProfile(parsed);
+    return requireDb().createProfile(parsed);
   });
   handle('profiles:update', (id, data) => {
     const pid = parseOrThrow(IdSchema, id, 'profiles.id');
     const parsed = parseOrThrow(ProfileUpdateSchema, data, 'profiles.update');
-    return db.updateProfile(pid, parsed);
+    return requireDb().updateProfile(pid, parsed);
   });
   handle('profiles:delete', (id) => {
     const pid = parseOrThrow(IdSchema, id, 'profiles.id');
-    return db.deleteProfile(pid);
+    return requireDb().deleteProfile(pid);
   });
   handle('profiles:activate', (id) => {
     const pid = parseOrThrow(IdSchema, id, 'profiles.id');
-    db.activateProfile(pid);
+    requireDb().activateProfile(pid);
   });
 
-  handle('themes:list', () => db.listThemes());
+  handle('themes:list', () => (db ? db.listThemes() : []));
 
-  handle('wallpapers:list', () => db.listWallpapers());
+  handle('wallpapers:list', () => (db ? db.listWallpapers() : []));
   handle('wallpapers:add', (data) => {
     const parsed = parseOrThrow(WallpaperAddSchema, data, 'wallpapers.add');
-    return db.addWallpaper(parsed);
+    return requireDb().addWallpaper(parsed);
   });
   handle('wallpapers:delete', (id) => {
     const pid = parseOrThrow(IdSchema, id, 'wallpapers.id');
-    return db.deleteAsset(pid);
+    return requireDb().deleteAsset(pid);
   });
   handle('wallpapers:favorite', (id, fav) => {
     const pid = parseOrThrow(IdSchema, id, 'wallpapers.id');
-    db.setFavorite(pid, Boolean(fav));
+    requireDb().setFavorite(pid, Boolean(fav));
   });
   handle('wallpapers:applySystem', async (imagePath) => {
     const p = parseOrThrow(WallpaperPathSchema, imagePath, 'wallpapers.path');
@@ -109,24 +118,24 @@ export function registerIpcHandlers(db: DatabaseService) {
     return setWallpaperOnMonitor(idx, p);
   });
 
-  handle('layouts:list', () => db.listLayouts());
+  handle('layouts:list', () => (db ? db.listLayouts() : []));
   handle('layouts:save', (data) => {
     const parsed = parseOrThrow(LayoutSaveSchema, data, 'layouts.save');
-    return db.saveLayout(parsed);
+    return requireDb().saveLayout(parsed);
   });
   handle('layouts:delete', (id) => {
     const pid = parseOrThrow(IdSchema, id, 'layouts.id');
-    return db.deleteLayout(pid);
+    return requireDb().deleteLayout(pid);
   });
 
-  handle('workspaces:list', () => db.listWorkspaces());
+  handle('workspaces:list', () => (db ? db.listWorkspaces() : []));
   handle('workspaces:get', (id) => {
     const pid = parseOrThrow(IdSchema, id, 'workspaces.id');
-    return db.getWorkspace(pid);
+    return requireDb().getWorkspace(pid);
   });
   handle('workspaces:save', (data) => {
     const parsed = parseOrThrow(WorkspaceSaveSchema, data, 'workspaces.save');
-    return db.saveWorkspace(parsed);
+    return requireDb().saveWorkspace(parsed);
   });
 
   handle('system:getStats', () => getSystemStats());
@@ -135,7 +144,7 @@ export function registerIpcHandlers(db: DatabaseService) {
   handle('system:setAutostart', (enabled) => {
     const v = parseOrThrow(AutostartSchema, enabled, 'system.autostart');
     setAutostart(v);
-    db.setSetting('system.autostart', String(v));
+    if (db) db.setSetting('system.autostart', String(v));
     return getAutostartEnabled();
   });
   handle('system:launchApp', (appPath) => {
@@ -172,7 +181,8 @@ export function registerIpcHandlers(db: DatabaseService) {
       node: process.versions.node,
       platform: process.platform,
       arch: process.arch,
-      schemaVersion: db.getSetting('db.schema_version'),
+      schemaVersion: db ? db.getSetting('db.schema_version') : null,
+      sqlite: db ? 'ok' : 'unavailable — run npm run rebuild:native',
       packaged: app.isPackaged,
     };
   });
