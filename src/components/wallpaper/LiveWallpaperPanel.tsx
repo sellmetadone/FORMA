@@ -11,6 +11,7 @@ import type { WallpaperEntry, WallpaperKind } from '@/core/wallpaper/types';
 import { smartPause } from '@/core/wallpaper/smartPause';
 import { VideoRenderer } from './VideoRenderer';
 import { WebRenderer } from './WebRenderer';
+import { AudioVisualizer } from './AudioVisualizer';
 import styles from '@/pages/Page.module.css';
 
 export function LiveWallpaperPanel() {
@@ -124,6 +125,10 @@ export function LiveWallpaperPanel() {
       </div>
       {liveMsg && <p className={styles.description}>{liveMsg}</p>}
 
+      <div style={{ marginBottom: 12 }}>
+        <AudioVisualizer height={40} />
+      </div>
+
       <div className={styles.grid}>
         {visible.map((e) => (
           <div key={e.id} className={styles.card}>
@@ -178,7 +183,11 @@ export function LiveWallpaperPanel() {
           {preview.kind === 'web' && <WebRenderer url={preview.source} />}
           {preview.kind === 'image' && (
             <img
-              src={preview.source.startsWith('http') ? preview.source : `file:///${preview.source.replace(/\\/g, '/')}`}
+              src={
+                preview.source.startsWith('http')
+                  ? preview.source
+                  : `file:///${preview.source.replace(/\\/g, '/')}`
+              }
               alt={preview.name}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
