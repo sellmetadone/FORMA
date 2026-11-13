@@ -1,17 +1,23 @@
 /** FORMA Backup / Import / Export — versioned JSON packages */
 
-export const BACKUP_FORMAT_VERSION = 1;
+export const BACKUP_FORMAT_VERSION = 2;
 
 export type FormaBackupPackage = {
   formatVersion: number;
   application: 'FORMA';
   exportedAt: string;
   appVersion?: string;
+  appearance?: {
+    themeId?: string;
+    locale?: string;
+    highContrast?: boolean;
+  };
   settings?: Record<string, string>;
   profiles?: unknown[];
   workspace?: unknown;
   widgets?: unknown[];
   customThemes?: unknown[];
+  wallpaperLibrary?: unknown[];
   activity?: unknown[];
 };
 
@@ -51,64 +57,140 @@ export function downloadJson(filename: string, data: unknown) {
   URL.revokeObjectURL(a.href);
 }
 
-export function collectLocalBackup(appVersion?: string): FormaBackupPackage {
+function readLS(key: string): unknown {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+export async function collectLocalBackup(appVersion?: string): Promise<FormaBackupPackage> {
   const settings: Record<string, string> = {};
   try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k?.startsWith('forma.')) settings[k] = localStorage.getItem(k) || '';
+    if (window.forma?.getSettings) {
+      const s = (await window.forma.getSettings()) as Record<string, string>;
+      Object.assign(settings, s);
     }
   } catch {
     /* ignore */
   }
-
-  let widgets: unknown[] = [];
   try {
-    const raw = localStorage.getItem('forma.widgets');
-    if (raw) widgets = JSON.parse(raw);
+    const themeId = localStorage.getItem('forma.themeId') || settings['ui.themeId'];
+    const locale = localStorage.getItem('forma.locale') || settings['ui.locale'];
+    if (themeId) settings['ui.themeId'] = themeId;
+    if (locale) settings['ui.locale'] = locale;
   } catch {
     /* ignore */
   }
 
-  let customThemes: unknown[] = [];
+  let profiles: unknown[] = [];
   try {
-    const raw = localStorage.getItem('forma.customThemes');
-    if (raw) customThemes = JSON.parse(raw);
-  } catch {
-    /* ignore */
-  }
-
-  let activity: unknown[] = [];
-  try {
-    const raw = localStorage.getItem('forma.activityLog');
-    if (raw) activity = JSON.parse(raw);
+    if (window.forma?.getProfiles) profiles = (await window.forma.getProfiles()) as unknown[];
   } catch {
     /* ignore */
   }
 
   let workspace: unknown = null;
   try {
+    if (window.forma?.getWorkspace) workspace = await window.forma.getWorkspace('ws-default');
+  } catch {
+    /* ignore */
+  }
+  if (!workspace) {
     const raw = localStorage.getItem('forma.workspace.ws-default');
     if (raw) workspace = { id: 'ws-default', config: raw };
+  }
+
+  const widgets = readLS('forma.widgets') || [];
+  const customThemes = readLS('forma.customThemes') || [];
+  const wallpaperLibrary = readLS('forma.wallpaperLibrary') || readLS('forma.wallpapers.library') || [];
+  const activity = readLS('forma.activity') || [];
+
+  let highContrast = false;
+  try {
+    highContrast = localStorage.getItem('forma.a11y.highContrast') === '1';
   } catch {
     /* ignore */
   }
 
   return buildFullBackup({
     appVersion,
+    appearance: {
+      themeId: settings['ui.themeId'] || localStorage.getItem('forma.themeId') || 'white',
+      locale: settings['ui.locale'] || localStorage.getItem('forma.locale') || 'en',
+      highContrast,
+    },
     settings,
+    profiles,
     workspace,
-    widgets,
-    customThemes,
-    activity,
+    widgets: Array.isArray(widgets) ? widgets : [],
+    customThemes: Array.isArray(customThemes) ? customThemes : [],
+    wallpaperLibrary: Array.isArray(wallpaperLibrary) ? wallpaperLibrary : [],
+    activity: Array.isArray(activity) ? activity : [],
   });
 }
 
-export function applyBackup(
+export async function applyBackup(
   pkg: FormaBackupPackage,
-  _opts: { overwriteSettings?: boolean; overwriteWorkspace?: boolean } = {}
-): string[] {
+  opts: { overwriteSettings?: boolean; overwriteWorkspace?: boolean } = {}
+): Promise<string[]> {
   const notes: string[] = [];
+
+  if (pkg.appearance) {
+    try {
+      if (pkg.appearance.themeId) {
+        localStorage.setItem('forma.themeId', pkg.appearance.themeId);
+        if (window.forma?.setSetting) await window.forma.setSetting('ui.themeId', pkg.appearance.themeId);
+      }
+      if (pkg.appearance.locale) {
+        localStorage.setItem('forma.locale', pkg.appearance.locale);
+        if (window.forma?.setSetting) await window.forma.setSetting('ui.locale', pkg.appearance.locale);
+      }
+      if (typeof pkg.appearance.highContrast === 'boolean') {
+        localStorage.setItem('forma.a11y.highContrast', pkg.appearance.highContrast ? '1' : '0');
+        document.documentElement.dataset.contrast = pkg.appearance.highContrast ? 'high' : 'normal';
+      }
+      notes.push('appearance applied');
+    } catch {
+      notes.push('appearance failed');
+    }
+  }
+
+  if (opts.overwriteSettings !== false && pkg.settings && window.forma?.setSetting) {
+    for (const [k, v] of Object.entries(pkg.settings)) {
+      try {
+        await window.forma.setSetting(k, v);
+      } catch {
+        notes.push(`settings:${k} failed`);
+      }
+    }
+    notes.push('settings applied');
+  }
+
+  if (opts.overwriteWorkspace !== false && pkg.workspace) {
+    try {
+      const ws = pkg.workspace as { id?: string; name?: string; config?: string };
+      const config =
+        typeof ws.config === 'string' ? ws.config : ws.config != null ? JSON.stringify(ws.config) : '';
+      if (window.forma?.saveWorkspace && config) {
+        await window.forma.saveWorkspace({
+          id: ws.id || 'ws-default',
+          name: ws.name || 'Restored',
+          config,
+        });
+        notes.push('workspace applied');
+      } else if (config) {
+        localStorage.setItem(`forma.workspace.${ws.id || 'ws-default'}`, config);
+        notes.push('workspace applied (local)');
+      }
+    } catch {
+      notes.push('workspace failed');
+    }
+  }
+
   if (pkg.widgets) {
     try {
       localStorage.setItem('forma.widgets', JSON.stringify(pkg.widgets));
@@ -117,6 +199,7 @@ export function applyBackup(
       notes.push('widgets failed');
     }
   }
+
   if (pkg.customThemes) {
     try {
       localStorage.setItem('forma.customThemes', JSON.stringify(pkg.customThemes));
@@ -125,23 +208,31 @@ export function applyBackup(
       notes.push('custom themes failed');
     }
   }
-  if (pkg.workspace) {
+
+  if (pkg.wallpaperLibrary) {
     try {
-      const ws = pkg.workspace as { id?: string; config?: string };
-      const cfg = typeof ws.config === 'string' ? ws.config : JSON.stringify(ws.config ?? ws);
-      localStorage.setItem(`forma.workspace.${ws.id || 'ws-default'}`, cfg);
-      notes.push('workspace applied');
+      localStorage.setItem('forma.wallpaperLibrary', JSON.stringify(pkg.wallpaperLibrary));
+      notes.push('wallpaper library applied');
     } catch {
-      notes.push('workspace failed');
+      notes.push('wallpaper library failed');
     }
   }
-  if (pkg.activity) {
-    try {
-      localStorage.setItem('forma.activityLog', JSON.stringify(pkg.activity));
-      notes.push('activity applied');
-    } catch {
-      notes.push('activity failed');
+
+  if (pkg.profiles && window.forma?.createProfile) {
+    for (const pr of pkg.profiles as { id?: string; name?: string; theme_id?: string }[]) {
+      if (!pr?.name) continue;
+      try {
+        await window.forma.createProfile({
+          id: `imported-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 5)}`,
+          name: `${pr.name} (import)`,
+          theme_id: pr.theme_id,
+        });
+      } catch {
+        notes.push(`profile ${pr.name} skip`);
+      }
     }
+    notes.push('profiles import attempted');
   }
+
   return notes;
 }
