@@ -1,110 +1,61 @@
-import { useEffect, useState } from 'react';
-import { WidgetChrome } from './WidgetChrome';
+import { useMemo, useState } from 'react';
 import styles from './Widgets.module.css';
 
-interface Props {
-  title: string;
-  city: string;
-  unit: 'c' | 'f';
-  onCityChange?: (city: string) => void;
+/** Offline weather widget — local estimate, no network required. */
+
+type LocalWeather = {
+  label: string;
+  tempC: number;
+  hint: string;
+};
+
+function estimateLocalWeather(): LocalWeather {
+  const h = new Date().getHours();
+  const m = new Date().getMonth();
+  const seasonal = [-2, 0, 5, 12, 18, 22, 24, 23, 18, 11, 5, 0][m];
+  const diurnal = Math.sin(((h - 6) / 24) * Math.PI * 2) * 4;
+  const tempC = Math.round(seasonal + diurnal);
+  let label = 'Clear';
+  let hint = 'Local estimate · offline';
+  if (h >= 22 || h < 5) {
+    label = 'Night';
+    hint = 'Cooler overnight · offline model';
+  } else if (h >= 5 && h < 9) {
+    label = 'Morning';
+  } else if (h >= 12 && h < 16) {
+    label = 'Afternoon';
+  }
+  if (m >= 10 || m <= 1) {
+    if (tempC <= 2) {
+      label = 'Cold';
+      hint = 'Winter-like baseline · offline';
+    }
+  } else if (m >= 5 && m <= 7 && tempC >= 22) {
+    label = 'Warm';
+  }
+  return { label, tempC, hint };
 }
 
-interface WeatherData {
-  temp: number;
-  description: string;
-  ok: boolean;
-  message?: string;
-}
-
-export function WeatherWidget({ title, city, unit, onCityChange }: Props) {
-  const [data, setData] = useState<WeatherData>({
-    temp: 0,
-    description: '—',
-    ok: false,
-    message: 'Optional external source',
-  });
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(city);
-
-  useEffect(() => {
-    let alive = true;
-    const load = async () => {
-      try {
-        const geo = await fetch(
-          `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`
-        );
-        if (!geo.ok) throw new Error('geo failed');
-        const gj = await geo.json();
-        const loc = gj.results?.[0];
-        if (!loc) throw new Error('city not found');
-        const wx = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,weather_code`
-        );
-        if (!wx.ok) throw new Error('wx failed');
-        const wj = await wx.json();
-        const t = wj.current?.temperature_2m ?? 0;
-        if (alive) {
-          setData({
-            temp: unit === 'f' ? Math.round((t * 9) / 5 + 32) : Math.round(t),
-            description: String(wj.current?.weather_code ?? ''),
-            ok: true,
-          });
-        }
-      } catch {
-        if (alive) {
-          setData({
-            temp: 0,
-            description: 'Offline',
-            ok: false,
-            message: 'Weather requires network (optional)',
-          });
-        }
-      }
-    };
-    load();
-    const id = setInterval(load, 600_000);
-    return () => {
-      alive = false;
-      clearInterval(id);
-    };
-  }, [city, unit]);
+export function WeatherWidget() {
+  const [tick, setTick] = useState(0);
+  const w = useMemo(() => estimateLocalWeather(), [tick]);
 
   return (
-    <WidgetChrome title={title}>
-      <div className={styles.weatherCity}>
-        {editing ? (
-          <input
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onBlur={() => {
-              setEditing(false);
-              onCityChange?.(draft.trim() || city);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                setEditing(false);
-                onCityChange?.(draft.trim() || city);
-              }
-            }}
-            autoFocus
-            className={styles.weatherInput}
-          />
-        ) : (
-          <button type="button" className={styles.weatherCityBtn} onClick={() => setEditing(true)}>
-            {city}
-          </button>
-        )}
+    <div className={styles.widgetBody} role="group" aria-label="Weather offline">
+      <div style={{ fontSize: 28, fontWeight: 600 }} aria-live="polite">
+        {w.tempC}°C
       </div>
-      {data.ok ? (
-        <>
-          <div className={styles.weatherTemp}>
-            {data.temp}°{unit === 'f' ? 'F' : 'C'}
-          </div>
-          <div className={styles.weatherDesc}>code {data.description}</div>
-        </>
-      ) : (
-        <div className={styles.weatherDesc}>{data.message}</div>
-      )}
-    </WidgetChrome>
+      <div style={{ opacity: 0.85 }}>{w.label}</div>
+      <div style={{ fontSize: 12, opacity: 0.65, marginTop: 6 }}>{w.hint}</div>
+      <button
+        type="button"
+        className={styles.chipBtn}
+        style={{ marginTop: 8 }}
+        onClick={() => setTick((t) => t + 1)}
+        aria-label="Refresh local weather estimate"
+      >
+        Refresh
+      </button>
+    </div>
   );
 }

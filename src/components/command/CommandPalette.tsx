@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { trapFocus } from '@/core/a11y';
 import { useAppStore } from '@/stores/appStore';
 import type { PageId } from '@/types';
 import styles from './CommandPalette.module.css';
@@ -24,6 +25,13 @@ export function CommandPalette() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
+  useEffect(() => {
+    if (!open) return;
+    const root = document.querySelector('[data-forma-command-palette]') as HTMLElement | null;
+    if (!root) return;
+    return trapFocus(root);
+  }, [open]);
+
   const commands: Cmd[] = useMemo(
     () => [
       { id: 'go-overview', label: 'Go: Overview', run: () => setPage('overview') },
@@ -46,14 +54,26 @@ export function CommandPalette() {
   if (!open) return null;
 
   return (
-    <div className={styles.overlay} onClick={() => setOpen(false)}>
-      <div className={styles.panel} onClick={(e) => e.stopPropagation()} role="dialog">
+    <div
+      className={styles.overlay}
+      data-forma-command-palette
+      onClick={() => setOpen(false)}
+      role="presentation"
+    >
+      <div
+        className={styles.panel}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Command palette"
+      >
         <input
           className={styles.input}
           autoFocus
           placeholder="Type a command… (Ctrl+K)"
           value={q}
           onChange={(e) => setQ(e.target.value)}
+          aria-label="Command search"
           onKeyDown={(e) => {
             if (e.key === 'Enter' && filtered[0]) {
               filtered[0].run();
@@ -61,9 +81,9 @@ export function CommandPalette() {
             }
           }}
         />
-        <ul className={styles.list}>
+        <ul className={styles.list} role="listbox">
           {filtered.map((c) => (
-            <li key={c.id}>
+            <li key={c.id} role="option">
               <button
                 type="button"
                 className={styles.item}
