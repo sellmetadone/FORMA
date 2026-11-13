@@ -8,13 +8,14 @@
   "type": "module",
   "main": "dist-electron/main/index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview",
-    "electron:dev": "vite",
-    "electron:build": "npm run build && electron-builder",
-    "postinstall": "electron-builder install-app-deps",
-    "rebuild:native": "electron-builder install-app-deps",
+    "dev": "npx vite",
+    "build": "tsc -b && npx vite build",
+    "preview": "npx vite preview",
+    "electron:dev": "npx vite",
+    "electron:build": "npm run build && npx electron-builder",
+    "start": "npx vite",
+    "postinstall": "node -e \"try{require('child_process').execSync('npx electron-builder install-app-deps',{stdio:'inherit'})}catch(e){console.warn('[FORMA] postinstall native rebuild skipped:',e.message)}\"",
+    "rebuild:native": "npx electron-builder install-app-deps",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
@@ -22,7 +23,7 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
     "ci": "npm run typecheck && npm test",
-    "electron:dev:manual": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron .\""
+    "electron:dev:manual": "concurrently -k \"npx vite\" \"wait-on http://localhost:5173 && npx electron .\""
   },
   "dependencies": {
     "better-sqlite3": "^11.7.0",
