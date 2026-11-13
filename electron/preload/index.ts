@@ -45,10 +45,13 @@ export type FormaAPI = {
     source: string;
     muted?: boolean;
     monitorIndex?: number | null;
-  }) => Promise<{ ok: boolean; error?: string; attachedWorkerW?: boolean }>;
+  }) => Promise<{ ok: boolean; error?: string; attachedWorkerW?: boolean; method?: string; monitors?: number }>;
   stopLiveWallpaper: () => Promise<{ ok: boolean }>;
   pauseLiveWallpaper: () => Promise<{ ok: boolean }>;
   resumeLiveWallpaper: () => Promise<{ ok: boolean }>;
+  startSlideshow: (data: unknown) => Promise<unknown>;
+  stopSlideshow: () => Promise<unknown>;
+  setLivePerformance: (data: unknown) => Promise<unknown>;
   getLiveWallpaperStatus: () => Promise<unknown>;
   onEvent: (channel: string, callback: (...args: unknown[]) => void) => () => void;
 };
@@ -92,6 +95,9 @@ const api: FormaAPI = {
   stopLiveWallpaper: () => ipcRenderer.invoke('liveWallpaper:stop'),
   pauseLiveWallpaper: () => ipcRenderer.invoke('liveWallpaper:pause'),
   resumeLiveWallpaper: () => ipcRenderer.invoke('liveWallpaper:resume'),
+  startSlideshow: (data) => ipcRenderer.invoke('liveWallpaper:slideshow', data),
+  stopSlideshow: () => ipcRenderer.invoke('liveWallpaper:stopSlideshow'),
+  setLivePerformance: (data) => ipcRenderer.invoke('liveWallpaper:setPerformance', data),
   getLiveWallpaperStatus: () => ipcRenderer.invoke('liveWallpaper:status'),
   onEvent: (channel, callback) => {
     const listener = (_event: Electron.IpcRendererEvent, ...args: unknown[]) => callback(...args);
