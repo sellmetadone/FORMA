@@ -1,44 +1,30 @@
 @echo off
+chcp 65001 >nul
 setlocal EnableExtensions
 cd /d "%~dp0"
-
 title FORMA
+
 echo === FORMA run ===
-echo Working directory: %CD%
+echo %CD%
 echo.
 
 where node >nul 2>&1
 if errorlevel 1 (
-  echo ERROR: Node.js not found. Install from https://nodejs.org/
-  goto :end
+  echo ERROR: Node.js not found.
+  goto END
 )
 
-if not exist "package.json" (
-  echo ERROR: package.json not found.
-  goto :end
+if not exist "node_modules\vite\package.json" (
+  echo node_modules incomplete. Run START.bat or:
+  echo   npm install
+  goto END
 )
 
-if not exist "node_modules\" (
-  echo node_modules missing. Run install-and-run.bat first.
-  goto :end
-)
-
-echo Node:
-node -v
-echo.
-echo Starting FORMA (vite + electron)...
-echo Leave this window open. Press Ctrl+C to stop.
-echo.
-
+echo Starting...
 call npm run electron:dev
 echo.
-echo --- FORMA exited, code %ERRORLEVEL% ---
-echo If the window closed immediately, errors are above.
-echo Try:
-echo   npm run rebuild:native
-echo   git pull origin main
-echo   npm run electron:dev
+echo Exit code: %ERRORLEVEL%
 
-:end
+:END
 echo.
 pause

@@ -1,71 +1,71 @@
 @echo off
+chcp 65001 >nul
 setlocal EnableExtensions
 cd /d "%~dp0"
-
 title FORMA install
-echo === FORMA install-and-run ===
-echo Working directory: %CD%
+
+echo ========================================
+echo   FORMA — install and run
+echo   Folder: %CD%
+echo ========================================
 echo.
 
 where node >nul 2>&1
 if errorlevel 1 (
-  echo ERROR: Node.js not found. Install from https://nodejs.org/
-  goto :end
+  echo [ERROR] Node.js not found: https://nodejs.org/
+  goto END
 )
-
 where npm >nul 2>&1
 if errorlevel 1 (
-  echo ERROR: npm not found.
-  goto :end
+  echo [ERROR] npm not found.
+  goto END
 )
 
-echo Node:
-node -v
-echo npm:
-npm -v
+echo Node: & node -v
+echo npm:  & npm -v
 echo.
 
-for /f "delims=" %%A in ('npm config get prefix 2^>nul') do set NPM_PREFIX=%%A
-for /f "delims=" %%A in ('npm config get cache 2^>nul') do set NPM_CACHE=%%A
-echo npm prefix=%NPM_PREFIX%
-echo npm cache=%NPM_CACHE%
-
-echo %NPM_PREFIX% | findstr /I /C:"F:\" >nul
-if not errorlevel 1 (
-  echo Resetting invalid npm prefix...
-  npm config delete prefix
+call npm config get prefix > "%TEMP%\forma-npm-prefix.txt" 2>nul
+if exist "%TEMP%\forma-npm-prefix.txt" (
+  findstr /I /R /C:"^[A-Za-z]:\\$" "%TEMP%\forma-npm-prefix.txt" >nul
+  if not errorlevel 1 (
+    echo Resetting npm prefix (was drive root^)...
+    call npm config delete prefix
+  )
 )
-echo %NPM_CACHE% | findstr /I /C:"F:\" >nul
-if not errorlevel 1 (
-  echo Resetting invalid npm cache...
-  npm config delete cache
+call npm config get cache > "%TEMP%\forma-npm-cache.txt" 2>nul
+if exist "%TEMP%\forma-npm-cache.txt" (
+  findstr /I /R /C:"^[A-Za-z]:\\$" "%TEMP%\forma-npm-cache.txt" >nul
+  if not errorlevel 1 (
+    echo Resetting npm cache path (was drive root^)...
+    call npm config delete cache
+  )
 )
-
-npm config set cache "%CD%\.npm-cache" --location=project 2>nul
 
 echo.
-echo Running npm install...
+echo [1/3] npm install ...
 call npm install
 if errorlevel 1 (
-  echo npm install FAILED.
-  goto :end
+  echo [ERROR] npm install failed. Scroll up for details.
+  goto END
 )
 
 echo.
-echo Rebuilding native modules...
+echo [2/3] rebuild native (better-sqlite3 for Electron^) ...
 call npm run rebuild:native
 if errorlevel 1 (
-  echo WARNING: rebuild failed — SQLite may not work.
+  echo [WARN] native rebuild failed — app may still start, SQLite may fail.
+  echo        Install Visual Studio Build Tools "Desktop development with C++"
 )
 
 echo.
-echo Starting FORMA...
-echo Leave this window open. Press Ctrl+C to stop.
+echo [3/3] start app ...
+echo Keep this window open. Ctrl+C to stop.
 echo.
 call npm run electron:dev
 echo.
-echo --- FORMA exited, code %ERRORLEVEL% ---
+echo Exit code: %ERRORLEVEL%
 
-:end
+:END
 echo.
 pause
