@@ -14,11 +14,12 @@ export type FormaAPI = {
   addWallpaper: (data: unknown) => Promise<unknown>;
   deleteWallpaper: (id: string) => Promise<boolean>;
   favoriteWallpaper: (id: string, fav: boolean) => Promise<void>;
-  applySystemWallpaper: (imagePath: string) => Promise<{ ok: boolean; error?: string }>;
+  applySystemWallpaper: (imagePath: string, previousPath?: string) => Promise<{ ok: boolean; error?: string; crossfaded?: boolean }>;
   applyWallpaperOnMonitor: (
     monitorIndex: number,
-    imagePath: string
-  ) => Promise<{ ok: boolean; error?: string }>;
+    imagePath: string,
+    previousPath?: string
+  ) => Promise<{ ok: boolean; error?: string; crossfaded?: boolean }>;
   getLayouts: () => Promise<unknown[]>;
   saveLayout: (data: unknown) => Promise<unknown>;
   deleteLayout: (id: string) => Promise<boolean>;
@@ -70,9 +71,10 @@ const api: FormaAPI = {
   addWallpaper: (data) => ipcRenderer.invoke('wallpapers:add', data),
   deleteWallpaper: (id) => ipcRenderer.invoke('wallpapers:delete', id),
   favoriteWallpaper: (id, fav) => ipcRenderer.invoke('wallpapers:favorite', id, fav),
-  applySystemWallpaper: (imagePath) => ipcRenderer.invoke('wallpapers:applySystem', imagePath),
-  applyWallpaperOnMonitor: (monitorIndex, imagePath) =>
-    ipcRenderer.invoke('wallpapers:applyOnMonitor', monitorIndex, imagePath),
+  applySystemWallpaper: (imagePath, previousPath) =>
+    ipcRenderer.invoke('wallpapers:applySystem', imagePath, previousPath),
+  applyWallpaperOnMonitor: (monitorIndex, imagePath, previousPath) =>
+    ipcRenderer.invoke('wallpapers:applyOnMonitor', monitorIndex, imagePath, previousPath),
   getLayouts: () => ipcRenderer.invoke('layouts:list'),
   saveLayout: (data) => ipcRenderer.invoke('layouts:save', data),
   deleteLayout: (id) => ipcRenderer.invoke('layouts:delete', id),
