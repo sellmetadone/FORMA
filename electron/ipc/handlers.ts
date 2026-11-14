@@ -15,6 +15,7 @@ import {
   restoreCursors,
   listImportedAssets,
 } from '../windows/system';
+import { applyWallpaperWithCrossfade } from '../windows/wallpaperCrossfade';
 import {
   startLiveWallpaper,
   stopLiveWallpaper,
@@ -111,14 +112,31 @@ export function registerIpcHandlers(db: DatabaseService | null) {
     const pid = parseOrThrow(IdSchema, id, 'wallpapers.id');
     requireDb().setFavorite(pid, Boolean(fav));
   });
-  handle('wallpapers:applySystem', async (imagePath) => {
+  handle('wallpapers:applySystem', async (imagePath, previousPath) => {
     const p = parseOrThrow(WallpaperPathSchema, imagePath, 'wallpapers.path');
-    return setWallpaper(p);
+    const prev =
+      typeof previousPath === 'string' && previousPath.length > 0
+        ? parseOrThrow(WallpaperPathSchema, previousPath, 'wallpapers.previous')
+        : null;
+    return applyWallpaperWithCrossfade({
+      imagePath: p,
+      previousPath: prev,
+      durationMs: 700,
+    });
   });
-  handle('wallpapers:applyOnMonitor', async (monitorIndex, imagePath) => {
+  handle('wallpapers:applyOnMonitor', async (monitorIndex, imagePath, previousPath) => {
     const idx = parseOrThrow(MonitorIndexSchema, monitorIndex, 'monitorIndex');
     const p = parseOrThrow(WallpaperPathSchema, imagePath, 'wallpapers.path');
-    return setWallpaperOnMonitor(idx, p);
+    const prev =
+      typeof previousPath === 'string' && previousPath.length > 0
+        ? parseOrThrow(WallpaperPathSchema, previousPath, 'wallpapers.previous')
+        : null;
+    return applyWallpaperWithCrossfade({
+      imagePath: p,
+      previousPath: prev,
+      monitorIndex: idx,
+      durationMs: 700,
+    });
   });
 
   handle('layouts:list', () => (db ? db.listLayouts() : []));
