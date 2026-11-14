@@ -1,61 +1,111 @@
-/* FORMA global styles */
+/* FORMA — restrained, tactile interface foundation */
 *,
 *::before,
-*::after {
-  box-sizing: border-box;
+*::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+
+:root {
+  color-scheme: light;
+  --forma-motion-fast: 140ms;
+  --forma-motion: 220ms;
+  --forma-motion-slow: 360ms;
+  --forma-ease: cubic-bezier(.2,.75,.25,1);
 }
 
-html,
-body,
-#root {
-  height: 100%;
-  margin: 0;
-}
+html { background: var(--forma-bg, #fff); }
 
 body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family: Inter, "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
   background: var(--forma-bg, var(--color-bg, #f7f7f7));
   color: var(--forma-text, var(--color-text, #1a1a1a));
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color var(--forma-motion-slow) var(--forma-ease),
+              color var(--forma-motion-slow) var(--forma-ease);
 }
 
-button {
-  font: inherit;
-  cursor: pointer;
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+
+button,
+[role="button"],
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* A11y */
-.forma-sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+button:not(:disabled) {
+  transition:
+    transform var(--forma-motion-fast) var(--forma-ease),
+    background-color var(--forma-motion) var(--forma-ease),
+    border-color var(--forma-motion) var(--forma-ease),
+    color var(--forma-motion) var(--forma-ease),
+    box-shadow var(--forma-motion) var(--forma-ease),
+    opacity var(--forma-motion) var(--forma-ease);
 }
 
-:root[data-contrast='high'] {
-  --forma-bg: #000 !important;
-  --forma-surface: #111 !important;
-  --forma-text: #fff !important;
-  --forma-border: #fff !important;
-  --forma-accent: #ffe600 !important;
-  --color-bg: #000 !important;
-  --color-surface: #111 !important;
-  --color-text: #fff !important;
-  --color-border: #fff !important;
-  --color-accent: #ffe600 !important;
+button:not(:disabled):active {
+  transform: translateY(1px) scale(.975);
 }
 
-:root[data-contrast='high'] button,
-:root[data-contrast='high'] a {
-  outline: 2px solid #ffe600;
-  outline-offset: 2px;
+button:disabled {
+  cursor: not-allowed;
+  opacity: .52;
 }
+
+input, select, textarea {
+  color: var(--forma-text, #1a1a1a);
+  background: var(--forma-surface, #fff);
+  border: 1px solid var(--forma-border, #dedede);
+  border-radius: 9px;
+  min-height: 36px;
+  padding: 8px 11px;
+  outline: none;
+  transition: border-color var(--forma-motion) var(--forma-ease),
+              box-shadow var(--forma-motion) var(--forma-ease),
+              background-color var(--forma-motion) var(--forma-ease);
+}
+
+input:hover, select:hover, textarea:hover {
+  border-color: var(--forma-text-muted, #999);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--forma-accent, #2d5a4a);
+  box-shadow: 0 0 0 3px var(--forma-accent-muted, rgba(45,90,74,.12));
+}
+
+::selection { background: var(--forma-accent-muted, #e6f0ec); }
 
 :focus-visible {
   outline: 2px solid var(--forma-accent, #3d6b8c);
-  outline-offset: 2px;
+  outline-offset: 3px;
+}
+
+.forma-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+:root[data-contrast='high'] {
+  --forma-bg: #000 !important; --forma-surface: #111 !important;
+  --forma-text: #fff !important; --forma-border: #fff !important;
+  --forma-accent: #ffe600 !important; --color-bg: #000 !important;
+  --color-surface: #111 !important; --color-text: #fff !important;
+  --color-border: #fff !important; --color-accent: #ffe600 !important;
+}
+
+:root[data-contrast='high'] button,
+:root[data-contrast='high'] a { outline: 2px solid #ffe600; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
 }
