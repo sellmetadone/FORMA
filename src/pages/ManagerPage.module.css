@@ -1,12 +1,119 @@
 .toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
   align-items: center;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.fileBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--forma-radius-sm);
+  border: 1px solid var(--forma-accent);
+  background: var(--forma-accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.fileBtn:hover {
+  background: var(--forma-accent-hover);
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.mediaCard {
+  border: 1px solid var(--forma-border);
+  border-radius: var(--forma-radius-md);
+  background: var(--forma-surface);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--forma-transition, 220ms), box-shadow var(--forma-transition, 220ms);
+}
+
+.mediaCard:hover {
+  border-color: var(--forma-text-muted);
+  box-shadow: var(--forma-shadow-sm);
+}
+
+.mediaActive {
+  border-color: var(--forma-accent);
+  box-shadow: 0 0 0 1px var(--forma-accent);
+}
+
+.mediaThumb {
+  height: 100px;
+  background: linear-gradient(135deg, var(--forma-accent-muted), var(--forma-surface-hover));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mediaLetter {
+  font-size: 28px;
+  font-weight: 650;
+  color: var(--forma-accent);
+  opacity: 0.7;
+}
+
+.mediaMeta {
+  padding: 10px 12px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mediaName {
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--forma-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mediaPath {
+  font-size: 11px;
+  color: var(--forma-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mediaActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 12px;
+}
+
+.iconOnly {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--forma-radius-sm);
+  border: 1px solid var(--forma-border);
+  color: var(--forma-text-secondary);
+  background: var(--forma-bg);
+}
+
+.iconOnly:hover {
+  color: var(--forma-text);
+  border-color: var(--forma-text-muted);
 }
 
 .msg {
-  font-size: 13px;
-  color: var(--forma-text-secondary, #666);
+  font-size: 12px;
+  color: var(--forma-success);
 }
