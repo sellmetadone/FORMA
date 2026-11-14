@@ -1,29 +1,50 @@
 {
   "name": "forma",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "FORMA — Windows Personal Workspace & Customization Platform",
   "author": "sellmetadone",
   "license": "MIT",
   "private": true,
   "type": "module",
   "main": "dist-electron/main/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sellmetadone/FORMA.git"
+  },
+  "homepage": "https://github.com/sellmetadone/FORMA",
+  "bugs": {
+    "url": "https://github.com/sellmetadone/FORMA/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "forma",
+    "windows",
+    "desktop",
+    "wallpaper",
+    "customization",
+    "electron",
+    "workspace",
+    "themes"
+  ],
   "scripts": {
     "dev": "npx vite",
     "build": "tsc -b && npx vite build",
     "preview": "npx vite preview",
     "electron:dev": "npx vite",
     "electron:build": "npm run build && npx electron-builder",
-    "start": "npx vite",
-    "postinstall": "node -e \"try{require('child_process').execSync('npx electron-builder install-app-deps',{stdio:'inherit'})}catch(e){console.warn('[FORMA] postinstall native rebuild skipped:',e.message)}\"",
-    "rebuild:native": "npx electron-builder install-app-deps",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
-    "ci": "npm run typecheck && npm test",
-    "electron:dev:manual": "concurrently -k \"npx vite\" \"wait-on http://localhost:5173 && npx electron .\""
+    "ci": "npm run typecheck && npm test && npm run build",
+    "electron:dev:manual": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "postinstall": "node -e \"try{require('child_process').execSync('npx electron-builder install-app-deps',{stdio:'inherit'})}catch(e){console.warn('[FORMA] postinstall native rebuild skipped:',e.message)}\"",
+    "rebuild:native": "npx electron-builder install-app-deps",
+    "start": "npx vite"
   },
   "dependencies": {
     "better-sqlite3": "^11.7.0",
@@ -66,7 +87,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "artifactName": "FORMA-Setup-${version}.${ext}"
