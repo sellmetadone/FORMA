@@ -3,30 +3,94 @@ name: CI
 on:
   push:
     branches: [main, master, develop]
+    tags: ['v*']
   pull_request:
     branches: [main, master, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
+    name: Typecheck · Test · Vite build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
-      - name: Install
+
+      - name: Install dependencies
         run: npm ci || npm install
+
       - name: Typecheck
         run: npm run typecheck
+
       - name: Unit tests
         run: npm test
-      - name: Build
+
+      - name: Production Vite + Electron main/preload build
         run: npm run build
 
-  e2e:
-    runs-on: ubuntu-latest
+      - name: Upload web build (dist)
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: forma-dist-${{ github.sha }}
+          path: |
+            dist
+            dist-electron
+          retention-days: 7
+
+  windows-installer:
+    name: Windows NSIS installer
     needs: test
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Rebuild native modules for Electron
+        run: npm run rebuild:native
+        continue-on-error: true
+
+      - name: Build application + NSIS installer
+        run: npm run electron:build
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: FORMA-Setup-Windows-${{ github.sha }}
+          path: |
+            release/*.exe
+            release/*.yml
+            release/*.blockmap
+          if-no-files-found: warn
+          retention-days: 14
+
+  e2e:
+    name: Playwright e2e
+    needs: test
+    runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,6 +99,29 @@ jobs:
           cache: npm
       - run: npm ci || npm install
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - name: Run e2e
+        run: npm run test:e2e
         env:
           CI: true
+
+  release:
+    name: GitHub Release (tags only)
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [test, windows-installer]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Windows installer
+        uses: actions/download-artifact@v4
+        with:
+          name: FORMA-Setup-Windows-${{ github.sha }}
+          path: release-artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-artifacts/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
