@@ -1,33 +1,12 @@
 {
   "name": "forma",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "FORMA — Windows Personal Workspace & Customization Platform",
   "author": "sellmetadone",
   "license": "MIT",
   "private": true,
   "type": "module",
   "main": "dist-electron/main/index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sellmetadone/FORMA.git"
-  },
-  "homepage": "https://github.com/sellmetadone/FORMA",
-  "bugs": {
-    "url": "https://github.com/sellmetadone/FORMA/issues"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "keywords": [
-    "forma",
-    "windows",
-    "desktop",
-    "wallpaper",
-    "customization",
-    "electron",
-    "workspace",
-    "themes"
-  ],
   "scripts": {
     "dev": "npx vite",
     "build": "tsc -b && npx vite build",
@@ -87,12 +66,11 @@
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64"]
         }
       ],
-      "artifactName": "FORMA-Setup-${version}.${ext}"
+      "artifactName": "FORMA-Setup-${version}.${ext}",
+      "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
       "oneClick": false,
@@ -102,6 +80,28 @@
       "shortcutName": "FORMA"
     },
     "publish": null,
-    "forceCodeSigning": false
-  }
+    "forceCodeSigning": false,
+    "asarUnpack": ["**/*.node"]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sellmetadone/FORMA.git"
+  },
+  "homepage": "https://github.com/sellmetadone/FORMA",
+  "bugs": {
+    "url": "https://github.com/sellmetadone/FORMA/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "forma",
+    "windows",
+    "desktop",
+    "wallpaper",
+    "customization",
+    "electron",
+    "workspace",
+    "themes"
+  ]
 }
