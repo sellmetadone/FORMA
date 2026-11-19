@@ -236,3 +236,113 @@ export async function applyBackup(
 
   return notes;
 }
+
+/** Human-readable summary for restore preview */
+export function describeBackup(pkg: FormaBackupPackage): {
+  title: string;
+  lines: string[];
+  sections: { id: string; label: string; detail: string; present: boolean }[];
+} {
+  const sections = [
+    {
+      id: 'appearance',
+      label: 'Appearance',
+      present: Boolean(pkg.appearance?.themeId || pkg.appearance?.locale),
+      detail: [
+        pkg.appearance?.themeId ? `theme=${pkg.appearance.themeId}` : '',
+        pkg.appearance?.locale ? `locale=${pkg.appearance.locale}` : '',
+        pkg.appearance?.highContrast ? 'highContrast' : '',
+      ]
+        .filter(Boolean)
+        .join(', ') || '—',
+    },
+    {
+      id: 'settings',
+      label: 'Settings',
+      present: Boolean(pkg.settings && Object.keys(pkg.settings).length),
+      detail: pkg.settings ? `${Object.keys(pkg.settings).length} keys` : '—',
+    },
+    {
+      id: 'workspace',
+      label: 'Workspace layout',
+      present: Boolean(pkg.workspace),
+      detail: pkg.workspace ? 'included' : '—',
+    },
+    {
+      id: 'widgets',
+      label: 'Widgets',
+      present: Array.isArray(pkg.widgets) && pkg.widgets.length > 0,
+      detail: Array.isArray(pkg.widgets) ? `${pkg.widgets.length} items` : '—',
+    },
+    {
+      id: 'wallpapers',
+      label: 'Wallpaper library',
+      present: Array.isArray(pkg.wallpaperLibrary) && pkg.wallpaperLibrary.length > 0,
+      detail: Array.isArray(pkg.wallpaperLibrary) ? `${pkg.wallpaperLibrary.length} items` : '—',
+    },
+    {
+      id: 'profiles',
+      label: 'Profiles',
+      present: Array.isArray(pkg.profiles) && pkg.profiles.length > 0,
+      detail: Array.isArray(pkg.profiles) ? `${pkg.profiles.length} profiles` : '—',
+    },
+    {
+      id: 'themes',
+      label: 'Custom themes',
+      present: Array.isArray(pkg.customThemes) && pkg.customThemes.length > 0,
+      detail: Array.isArray(pkg.customThemes) ? `${pkg.customThemes.length} themes` : '—',
+    },
+  ];
+  const lines = sections.filter((s) => s.present).map((s) => `${s.label}: ${s.detail}`);
+  return {
+    title: `FORMA snapshot · v${pkg.formatVersion} · ${pkg.exportedAt || 'unknown date'}`,
+    lines: lines.length ? lines : ['Empty snapshot'],
+    sections,
+  };
+}
+
+export type RestoreOptions = {
+  overwriteSettings?: boolean;
+  overwriteWorkspace?: boolean;
+  restoreWidgets?: boolean;
+  restoreWallpapers?: boolean;
+  restoreProfiles?: boolean;
+  restoreCustomThemes?: boolean;
+  safetyBackup?: boolean;
+};
+
+/** Apply backup with selective sections + optional pre-restore safety export */
+export async function restoreSnapshot(
+  pkg: FormaBackupPackage,
+  opts: RestoreOptions = {}
+): Promise<string[]> {
+  const notes: string[] = [];
+  if (opts.safetyBackup !== false) {
+    try {
+      const safety = await collectLocalBackup(pkg.appVersion);
+      downloadJson(
+        `forma-safety-before-restore-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.json`,
+        safety
+      );
+      notes.push('safety backup downloaded');
+    } catch (err) {
+      notes.push('safety backup failed: ' + String(err));
+    }
+  }
+
+  const filtered: FormaBackupPackage = {
+    ...pkg,
+    settings: opts.overwriteSettings === false ? undefined : pkg.settings,
+    workspace: opts.overwriteWorkspace === false ? undefined : pkg.workspace,
+    widgets: opts.restoreWidgets === false ? undefined : pkg.widgets,
+    wallpaperLibrary: opts.restoreWallpapers === false ? undefined : pkg.wallpaperLibrary,
+    profiles: opts.restoreProfiles === false ? undefined : pkg.profiles,
+    customThemes: opts.restoreCustomThemes === false ? undefined : pkg.customThemes,
+  };
+
+  const applied = await applyBackup(filtered, {
+    overwriteSettings: opts.overwriteSettings !== false,
+    overwriteWorkspace: opts.overwriteWorkspace !== false,
+  });
+  return [...notes, ...applied];
+}
