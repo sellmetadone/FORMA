@@ -1,1 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#2d5a4a"/><text x="16" y="22" text-anchor="middle" fill="#fff" font-size="14" font-family="system-ui" font-weight="700">F</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <rect width="128" height="128" rx="24" fill="#0a0a0a"/>
+  <rect x="36" y="28" width="64" height="22" rx="4" fill="#f2f2f2"/>
+  <rect x="36" y="54" width="22" height="46" rx="4" fill="#f2f2f2"/>
+  <rect x="62" y="54" width="38" height="22" rx="4" fill="#9caf88"/>
+</svg>

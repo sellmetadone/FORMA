@@ -1,32 +1,24 @@
-# FORMA 1.0.1 — Release notes
+# FORMA 1.0.2
 
-**Date:** 2026-11-14  
-**Author:** sellmetadone
+## Highlights
+- **App icon** — official geometric F mark (window, tray, installer)
+- **Desktop wallpaper** — images via SPI/COM, video/GIF via WorkerW; unified Apply
+- **Administrator elevation** — START.bat UAC + NSIS requireAdministrator
+- **Snapshot restore UX** — load JSON → preview sections → selective restore + safety backup
+- **Native file picker** for wallpapers (Browse files…)
 
-## Install
+## Install (Windows)
+1. Download `FORMA-Setup-1.0.2.exe` from this Release (or build with `npm run electron:build`)
+2. Run installer (UAC required)
+3. Launch FORMA from Start Menu
 
-- Windows 10/11 x64
-- Node.js 18+ only needed for **source** builds
-- CI / `npm run electron:build` produces `FORMA-Setup-1.0.1.exe`
-
-## What’s new since 1.0.0
-
-1. **UI refresh** — clearer controls, focus states, wallpaper thumbnails + preview
-2. **Desktop wallpaper crossfade** — temporary fullscreen overlay then OS commit
-3. **GitHub Actions CI** — automatic tests + Windows installer artifacts
-4. More reliable **START.bat** install/run path
-
-## Known limits
-
-- Live WorkerW attachment varies by Windows version / third-party shell tools
-- CI installers are **unsigned**
-- Some e2e tests are best-effort in headless CI
-
-## Verify
-
+## Dev
 ```bat
-git pull
+git clone https://github.com/sellmetadone/FORMA.git
+cd FORMA
 START.bat
-npm run typecheck
-npm test
 ```
+
+## Notes
+- Live desktop WorkerW is best-effort on some Windows builds
+- Installer is not code-signed (`forceCodeSigning: false`)
