@@ -1,4 +1,4 @@
-import { ipcMain, app } from 'electron';
+import { ipcMain, app, dialog } from 'electron';
 import type { DatabaseService } from '../services/database';
 import {
   getSystemStats,
@@ -16,6 +16,7 @@ import {
   listImportedAssets,
 } from '../windows/system';
 import { applyWallpaperWithCrossfade } from '../windows/wallpaperCrossfade';
+import { applyToDesktop, detectDesktopMediaKind } from '../windows/desktopApply';
 import {
   startLiveWallpaper,
   stopLiveWallpaper,
@@ -118,11 +119,7 @@ export function registerIpcHandlers(db: DatabaseService | null) {
       typeof previousPath === 'string' && previousPath.length > 0
         ? parseOrThrow(WallpaperPathSchema, previousPath, 'wallpapers.previous')
         : null;
-    return applyWallpaperWithCrossfade({
-      imagePath: p,
-      previousPath: prev,
-      durationMs: 700,
-    });
+    return applyToDesktop({ source: p, previousPath: prev, monitorIndex: -1 });
   });
   handle('wallpapers:applyOnMonitor', async (monitorIndex, imagePath, previousPath) => {
     const idx = parseOrThrow(MonitorIndexSchema, monitorIndex, 'monitorIndex');
@@ -131,12 +128,28 @@ export function registerIpcHandlers(db: DatabaseService | null) {
       typeof previousPath === 'string' && previousPath.length > 0
         ? parseOrThrow(WallpaperPathSchema, previousPath, 'wallpapers.previous')
         : null;
-    return applyWallpaperWithCrossfade({
-      imagePath: p,
-      previousPath: prev,
-      monitorIndex: idx,
-      durationMs: 700,
+    return applyToDesktop({ source: p, previousPath: prev, monitorIndex: idx });
+  });
+  handle('wallpapers:detectKind', (imagePath) => {
+    const p = parseOrThrow(WallpaperPathSchema, imagePath, 'wallpapers.path');
+    return { kind: detectDesktopMediaKind(p) };
+  });
+  handle('wallpapers:pickFiles', async () => {
+    const result = await dialog.showOpenDialog({
+      title: 'FORMA — choose wallpaper',
+      properties: ['openFile', 'multiSelections'],
+      filters: [
+        {
+          name: 'Images & Video',
+          extensions: ['jpg', 'jpeg', 'png', 'webp', 'bmp', 'gif', 'mp4', 'webm', 'mkv', 'mov', 'm4v'],
+        },
+        { name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp', 'bmp', 'gif'] },
+        { name: 'Video', extensions: ['mp4', 'webm', 'mkv', 'mov', 'm4v'] },
+        { name: 'All files', extensions: ['*'] },
+      ],
     });
+    if (result.canceled) return [] as string[];
+    return result.filePaths;
   });
 
   handle('layouts:list', () => (db ? db.listLayouts() : []));
@@ -195,6 +208,18 @@ export function registerIpcHandlers(db: DatabaseService | null) {
   handle('cursors:restore', () => restoreCursors());
 
   handle('diagnostics:get', () => {
+    let elevated = true;
+    if (process.platform === 'win32') {
+      try {
+        require('child_process').execFileSync('net', ['session'], {
+          stdio: 'ignore',
+          windowsHide: true,
+        });
+        elevated = true;
+      } catch {
+        elevated = false;
+      }
+    }
     return {
       version: app.getVersion(),
       electron: process.versions.electron,
@@ -205,6 +230,7 @@ export function registerIpcHandlers(db: DatabaseService | null) {
       schemaVersion: db ? db.getSetting('db.schema_version') : null,
       sqlite: db ? 'ok' : 'unavailable — run npm run rebuild:native',
       packaged: app.isPackaged,
+      elevated,
     };
   });
 
