@@ -6,6 +6,7 @@ import { DatabaseService } from '../services/database';
 import { registerIpcHandlers } from '../ipc/handlers';
 import { getAutostartEnabled, setAutostart } from '../windows/system';
 import { stopLiveWallpaper } from '../windows/liveDesktop';
+import { ensureElevatedOrRelaunch, isProcessElevated } from './elevation';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -26,6 +27,11 @@ const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
 } else {
+  // Administrator rights on Windows (WorkerW / desktop wallpaper reliability)
+  if (process.platform === 'win32' && !ensureElevatedOrRelaunch()) {
+    app.exit(0);
+  }
+
   app.on('second-instance', () => {
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
@@ -196,6 +202,10 @@ app.whenReady().then(async () => {
     console.error('[FORMA] IPC registration failed:', err);
   }
 
+  if (process.platform === 'win32') {
+    console.log('[FORMA] Elevated:', isProcessElevated() ? 'yes' : 'no');
+  }
+
   createWindow();
   createTray();
 
@@ -226,6 +236,14 @@ app.on('will-quit', () => {
   }
   try {
     db?.close();
+  } catch {
+    /* ignore */
+  }
+});
+
+app.on('quit', () => {
+  try {
+    void stopLiveWallpaper();
   } catch {
     /* ignore */
   }
