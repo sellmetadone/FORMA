@@ -22,6 +22,15 @@ if not exist "package.json" (
   goto END
 )
 
+REM Elevate to Administrator (WorkerW / desktop wallpaper)
+net session >nul 2>&1
+if errorlevel 1 (
+  echo [!] Requesting Administrator rights...
+  powershell -NoProfile -Command "Start-Process -FilePath '%~f0' -Verb RunAs -WorkingDirectory '%~dp0'"
+  exit /b 0
+)
+echo [OK] Running elevated
+
 if not exist "node_modules\vite\package.json" (
   echo [!] Dependencies missing — running npm install...
   echo.
@@ -31,9 +40,14 @@ if not exist "node_modules\vite\package.json" (
     goto END
   )
   echo.
-  echo [!] Rebuilding native modules...
+  echo [!] Rebuilding native modules for Electron...
   call npm run rebuild:native
   echo.
+) else (
+  if not exist "node_modules\better-sqlite3\build\Release\better_sqlite3.node" (
+    echo [!] better-sqlite3 binary missing — rebuild:native...
+    call npm run rebuild:native
+  )
 )
 
 echo [OK] Starting Vite + Electron...
@@ -49,7 +63,7 @@ echo FORMA stopped. Exit code: %EXITCODE%
 echo ----------------------------------------
 if not "%EXITCODE%"=="0" (
   echo.
-  echo If vite was not found:
+  echo If vite / sqlite failed:
   echo   npm install
   echo   npm run rebuild:native
   echo   npm run electron:dev
